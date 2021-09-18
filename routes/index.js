@@ -85,5 +85,40 @@ router.post('/controlIsDone', async (ctx, next) => {
     ctx.body = error
   }
 })
-
+router.post('/selectAll', async (ctx, next) => {
+  try {
+    console.log('ctx.request.body', ctx.request.body)
+    const resFindAll = await ApiModel.find({})
+    if (resFindAll) {
+      resFindAll.forEach(async (item) => {
+        const docs = await ApiModel.update({ id: item.id }, { done: ctx.request.body.done })
+        console.log('docs :>> ', docs);
+        ctx.body = {
+          data: docs
+        }
+      })
+    }
+  } catch (error) {
+    console.log(error);
+    ctx.body = error
+  }
+})
+router.delete('/deleteDone', async (ctx, next) => {
+  try {
+    const resFindDone = await ApiModel.find({ done: true })
+    // console.log('resFindDone :>> ', resFindDone);
+    if (resFindDone) {
+      resFindDone.forEach(async (item) => {
+        const resDeleteOne = await ApiModel.deleteOne({ id: new RegExp(item.id) })
+        console.log('resDeleteOne :>> ', resDeleteOne);
+        ctx.body = {
+          data: resDeleteOne
+        }
+      })
+    }
+  } catch (error) {
+    console.log(error);
+    ctx.body = error
+  }
+})
 module.exports = router
